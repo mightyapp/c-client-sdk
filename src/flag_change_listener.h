@@ -26,6 +26,8 @@ LDi_freeListeners(struct ChangeListener** listeners);
  * If allocation fails, returns false. */
 LDBoolean
 LDi_listenerAdd(struct ChangeListener** listeners, const char* flag, LDlistenerfn callback);
+LDBoolean
+LDi_listenerAddWithClosure(struct ChangeListener** listeners, const char* flag, LDlistenerfn callback, void *const closure);
 
 /* Deletes a listener from the list. */
 void

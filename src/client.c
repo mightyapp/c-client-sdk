@@ -1289,6 +1289,41 @@ LDClientRegisterFeatureFlagListener(
     return LDi_storeRegisterListener(&client->store, key, fn);
 }
 
+LDBoolean
+LDClientRegisterFeatureFlagListenerWithClosure(
+    struct LDClient *const client, const char *const key, LDlistenerfn fn, void *const closure)
+{
+    LD_ASSERT_API(client);
+    LD_ASSERT_API(key);
+    LD_ASSERT_API(fn);
+    LD_ASSERT_API(closure);
+
+#ifdef LAUNCHDARKLY_DEFENSIVE
+    if (client == NULL) {
+        LD_LOG(
+            LD_LOG_WARNING, "LDClientRegisterFeatureFlagListener NULL client");
+
+        return LDBooleanFalse;
+    }
+
+    if (key == NULL) {
+        LD_LOG(LD_LOG_WARNING, "LDClientRegisterFeatureFlagListener NULL key");
+
+        return LDBooleanFalse;
+    }
+
+    if (fn == NULL) {
+        LD_LOG(
+            LD_LOG_WARNING,
+            "LDClientRegisterFeatureFlagListener NULL listener");
+
+        return LDBooleanFalse;
+    }
+#endif
+
+    return LDi_storeRegisterListenerWithClosure(&client->store, key, fn, closure);
+}
+
 void
 LDClientUnregisterFeatureFlagListener(
     struct LDClient *const client, const char *const key, LDlistenerfn fn)

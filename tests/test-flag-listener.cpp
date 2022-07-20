@@ -38,7 +38,7 @@ struct callbackSpy {
 
 // Helper to define a callback function for a particular unit test.
 #define DEFINE_TEST_CALLBACK(name) \
-static void name(const char* const flagKey, const int status) { spy.record(#name, flagKey, status); }
+static void name(const char* const flagKey, const int status, void *const closure) { spy.record(#name, flagKey, status); }
 
 static callbackSpy spy;
 

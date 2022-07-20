@@ -11,10 +11,11 @@ struct ChangeListener {
     LDlistenerfn callback;
     /* Used by utlist.h macros. */
     struct ChangeListener *next;
+    void *closure;
 };
 
 static struct ChangeListener *
-newListener(const char* flag, LDlistenerfn callback) {
+newListenerWithClosure(const char* flag, LDlistenerfn callback, void *const closure) {
     struct ChangeListener *listener = NULL;
 
     if (!(listener = LDAlloc(sizeof(struct ChangeListener)))) {
@@ -24,6 +25,7 @@ newListener(const char* flag, LDlistenerfn callback) {
     listener->callback = callback;
     listener->flag = NULL;
     listener->next = NULL;
+    listener->closure = closure;
 
     if (!(listener->flag = LDStrDup(flag))) {
         LDFree(listener);
@@ -52,6 +54,15 @@ flagcmp(struct ChangeListener *a, struct ChangeListener *b) {
     /* If the listeners have the same flag & callback, they are equal. */
     if (a->callback == b->callback) {
         return 0;
+    }
+
+    /* If the listeners have different closures, they're not equal. */
+    if (a->closure != b->closure) {
+        if (a->closure < b->closure) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 
     /* Otherwise, sort by the callback address to provide something stable.*/
@@ -90,7 +101,30 @@ LDi_listenerAdd(struct ChangeListener** listeners, const char* flag, LDlistenerf
     new = NULL;
     existing = NULL;
 
-    if (!(new = newListener(flag, callback))) {
+    if (!(new = newListenerWithClosure(flag, callback, NULL))) {
+        return LDBooleanFalse;
+    }
+
+    LL_SEARCH(*listeners, existing, new, flagcmp);
+
+    /* Ensure uniqueness of (flag, function pointer) combo. */
+    if (existing) {
+        freeListener(new);
+        return LDBooleanTrue;
+    }
+
+    LL_PREPEND(*listeners, new);
+    return LDBooleanTrue;
+}
+
+LDBoolean
+LDi_listenerAddWithClosure(struct ChangeListener** listeners, const char* flag, LDlistenerfn callback, void *const closure) {
+    struct ChangeListener *new, *existing;
+
+    new = NULL;
+    existing = NULL;
+
+    if (!(new = newListenerWithClosure(flag, callback, closure))) {
         return LDBooleanFalse;
     }
 
@@ -132,8 +166,9 @@ LDi_listenersDispatch(struct ChangeListener* listeners, const char *flag, LDBool
     listener = NULL;
 
     LL_FOREACH_SAFE(listeners, listener, tmp) {
-        if (strcmp(listener->flag, flag) == 0) {
-            listener->callback(flag, status);
+        /* Mighty allows registering a catch all listener under "*". */
+        if (strcmp(listener->flag, flag) == 0 || strcmp(listener->flag, "*") == 0) {
+            listener->callback(flag, status, listener->closure);
         }
     }
 }

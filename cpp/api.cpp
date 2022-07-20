@@ -200,6 +200,13 @@ LDClientCPP::registerFeatureFlagListener(const std::string &name,
     return LDClientRegisterFeatureFlagListener(this->client, name.c_str(), fn);
 }
 
+bool
+LDClientCPP::registerFeatureFlagListenerWithClosure(const std::string &name,
+    LDlistenerfn fn, void* closure)
+{
+    return LDClientRegisterFeatureFlagListenerWithClosure(this->client, name.c_str(), fn, closure);
+}
+
 void
 LDClientCPP::unregisterFeatureFlagListener(const std::string &name,
     LDlistenerfn fn)

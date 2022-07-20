@@ -347,6 +347,22 @@ LDi_storeRegisterListener(struct LDStore *const store, const char *const flagKey
 
     return status;
 }
+LDBoolean
+LDi_storeRegisterListenerWithClosure(struct LDStore *const store, const char *const flagKey, LDlistenerfn op, void *const closure)
+{
+    LDBoolean status;
+
+    LD_ASSERT(store);
+    LD_ASSERT(flagKey);
+    LD_ASSERT(op);
+    LD_ASSERT(closure);
+
+    LDi_rwlock_wrlock(&store->lock);
+    status = LDi_listenerAddWithClosure(&store->listeners, flagKey, op, closure);
+    LDi_rwlock_wrunlock(&store->lock);
+
+    return status;
+}
 
 void
 LDi_storeUnregisterListener(struct LDStore *const store, const char *const flagKey, LDlistenerfn op)

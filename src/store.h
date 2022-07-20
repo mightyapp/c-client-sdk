@@ -59,6 +59,9 @@ LDi_storeGetJSON(struct LDStore *const store);
 LDBoolean
 LDi_storeRegisterListener(
     struct LDStore *const store, const char *const flagKey, LDlistenerfn op);
+LDBoolean
+LDi_storeRegisterListenerWithClosure(
+    struct LDStore *const store, const char *const flagKey, LDlistenerfn op, void *const closure);
 
 void
 LDi_storeUnregisterListener(

@@ -139,6 +139,7 @@ class LD_EXPORT(LDClientCPP) {
 
         /** @brief Register a callback for when a flag is updated. */
         bool registerFeatureFlagListener(const std::string &name, LDlistenerfn fn);
+        bool registerFeatureFlagListenerWithClosure(const std::string &name, LDlistenerfn fn, void* closure);
 
         /** @brief Unregister a callback registered with `LDClientRegisterFeatureFlagListener`. */
         void unregisterFeatureFlagListener(const std::string &name, LDlistenerfn fn);

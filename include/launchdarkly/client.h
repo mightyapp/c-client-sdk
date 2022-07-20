@@ -259,7 +259,7 @@ LD_EXPORT(void) LDFreeDetailContents(LDVariationDetails details);
  * safe.
  *
  * Status 0 for new or updated, 1 for deleted. */
-typedef void (*LDlistenerfn)(const char *const flagKey, const int status);
+typedef void (*LDlistenerfn)(const char *const flagKey, const int status, void *const closure);
 
 /** @brief Register a callback for when a flag is updated. */
 LD_EXPORT(LDBoolean)
@@ -267,6 +267,12 @@ LDClientRegisterFeatureFlagListener(
     struct LDClient *const client,
     const char *const      flagKey,
     LDlistenerfn           listener);
+LD_EXPORT(LDBoolean)
+LDClientRegisterFeatureFlagListenerWithClosure(
+    struct LDClient *const client,
+    const char *const      flagKey,
+    LDlistenerfn           listener,
+    void *const            closure);
 
 /** @brief Unregister a callback registered with
  * `LDClientRegisterFeatureFlagListener` */
